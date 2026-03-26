@@ -190,6 +190,28 @@ class ParticleFilter:
 
         # Initialize uniformly-distributed particles
         ######### Your code starts here #########
+        self.map = map_
+        self.n_particles = n_particles
+        self.translation_variance = translation_variance
+        self.rotation_variance = rotation_variance
+        self.measurement_variance = measurement_variance
+        x_min, x_max, y_min, y_max = self.map.map_aabb
+
+        def in_obstacle(x, y):
+            for ox0, ox1, oy0, oy1 in self.map.obstacles:
+                if ox0 <= x <= ox1 and oy0 <= y <= oy1:
+                    return True
+            return False
+
+        self._particles = []
+        while len(self._particles) < n_particles:
+            x = uniform(x_min, x_max)
+            y = uniform(y_min, y_max)
+            if in_obstacle(x, y):
+                continue
+            theta = uniform(-pi, pi)
+            self._particles.append(Particle(x, y, theta, -math.log(n_particles)))
+
 
         ######### Your code ends here #########
 
@@ -222,6 +244,17 @@ class ParticleFilter:
 
         # Propagate motion of each particle
         ######### Your code starts here #########
+        delta_theta = angle_to_neg_pi_to_pi(delta_theta)
+
+        for p in self._particles:
+            dx = delta_x * math.cos(p.theta) - delta_y * math.sin(p.theta)
+            dy = delta_x * math.sin(p.theta) + delta_y * math.cos(p.theta)
+
+            p.x += dx + np.random.normal(0.0, self.translation_variance)
+            p.y += dy + np.random.normal(0.0, self.translation_variance)
+            p.theta = angle_to_neg_pi_to_pi(
+                p.theta + delta_theta + np.random.normal(0.0, self.rotation_variance)
+            )
 
         ######### Your code ends here #########
 
@@ -235,12 +268,51 @@ class ParticleFilter:
 
         # Calculate posterior probabilities and resample
         ######### Your code starts here #########
+        if z is None or z == inf:
+            return
+
+        log_ws = []
+        for p in self._particles:
+            expected = self.map.closest_distance(
+                (p.x, p.y), angle_to_0_to_2pi(p.theta + scan_angle_in_rad)
+            )
+            if expected is None:
+                log_w = -1e9
+            else:
+                log_w = scipy.stats.norm(
+                    loc=expected, scale=self.measurement_variance
+                ).logpdf(z)
+            p.log_p = log_w
+            log_ws.append(log_w)
+
+        max_log_w = max(log_ws) if log_ws else 0.0
+        weights = np.array([math.exp(w - max_log_w) for w in log_ws], dtype=float)
+        s = weights.sum()
+        if s <= 0 or not np.isfinite(s):
+            weights = np.ones(len(self._particles), dtype=float) / len(self._particles)
+        else:
+            weights /= s
+
+        idxs = choice(len(self._particles), size=self.n_particles, p=weights)
+        self._particles = [copy.deepcopy(self._particles[i]) for i in idxs]
+        for p in self._particles:
+            p.log_p = -math.log(self.n_particles)
+
 
         ######### Your code ends here #########
 
     def get_estimate(self) -> Tuple[float, float, float]:
         # Estimate robot's location using particle weights
         ######### Your code starts here #########
+        if not self._particles:
+            return 0.0, 0.0, 0.0
+
+        xs = np.mean([p.x for p in self._particles])
+        ys = np.mean([p.y for p in self._particles])
+        c = np.mean([math.cos(p.theta) for p in self._particles])
+        s = np.mean([math.sin(p.theta) for p in self._particles])
+        return float(xs), float(ys), float(math.atan2(s, c))
+
 
         ######### Your code ends here #########
 
@@ -315,6 +387,13 @@ class Controller:
         ######### Your code starts here #########
         # NOTE: with more than 2 angles the particle filter will converge too quickly, so with high likelihood the
         # correct neighborhood won't be found.
+        if self.current_position is None or self.laserscan is None:
+            return
+
+        mid = len(self.laserscan.ranges) // 2
+        z = self.laserscan.ranges[mid]
+        if z != inf:
+            self._particle_filter.measure(z, 0.0)
 
         ######### Your code ends here #########
 
@@ -328,6 +407,7 @@ class Controller:
         """
         # Robot autonomously explores environment while it localizes itself
         ######### Your code starts here #########
+        return
 
         ######### Your code ends here #########
 
