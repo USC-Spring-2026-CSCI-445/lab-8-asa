@@ -515,8 +515,8 @@ if __name__ == "__main__":
         while not rospy.is_shutdown():
             print("\nEnter 'a', 'w', 's', 'd' to move the robot:")
             uinput = input("")
-            self._particle_filter.visualize_estimate()
-            self._particle_filter.visualize_particles()
+            particle_filter.visualize_estimate()
+            particle_filter.visualize_particles()
             
             if uinput == "w": # forward
                 ######### Your code starts here #########
