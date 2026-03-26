@@ -392,8 +392,10 @@ class Controller:
 
         mid = len(self.laserscan.ranges) // 2
         z = self.laserscan.ranges[mid]
-        if z != inf:
+        if z != inf and not math.isnan(z):
             self._particle_filter.measure(z, 0.0)
+            self._particle_filter.visualize_particles()
+            self._particle_filter.visualize_estimate()
 
         ######### Your code ends here #########
 
@@ -442,6 +444,8 @@ class Controller:
 
         self.robot_ctrl_pub.publish(Twist())
         self._particle_filter.move_by(distance, 0.0, 0.0)
+        self._particle_filter.visualize_particles()
+        self._particle_filter.visualize_estimate()
 
         ######### Your code ends here #########
 
@@ -473,6 +477,8 @@ class Controller:
 
         delta_theta = angle_to_neg_pi_to_pi(goal_theta - start_theta)
         self._particle_filter.move_by(0.0, 0.0, delta_theta)
+        self._particle_filter.visualize_particles()
+        self._particle_filter.visualize_estimate()
 
 
         ######### Your code ends here #########
@@ -512,28 +518,28 @@ if __name__ == "__main__":
             if uinput == "w": # forward
                 ######### Your code starts here #########
                 controller.forward_action(0.25)
-                self._particle_filter.visualize_particles()
-                self._particle_filter.visualize_estimate()
+                # self._particle_filter.visualize_particles()
+                # self._particle_filter.visualize_estimate()
                 ######### Your code ends here #########
             elif uinput == "a": # left
                 ######### Your code starts here #########
                 goal_theta = angle_to_neg_pi_to_pi(goal_theta + pi / 2)
                 controller.rotate_action(goal_theta)
-                self._particle_filter.visualize_particles()
-                self._particle_filter.visualize_estimate()
+                # self._particle_filter.visualize_particles()
+                # self._particle_filter.visualize_estimate()
                 ######### Your code ends here #########
             elif uinput == "d": #right
                 ######### Your code starts here #########
                 goal_theta = angle_to_neg_pi_to_pi(goal_theta - pi / 2)
                 controller.rotate_action(goal_theta)
-                self._particle_filter.visualize_particles()
-                self._particle_filter.visualize_estimate()
+                # self._particle_filter.visualize_particles()
+                # self._particle_filter.visualize_estimate()
                 ######### Your code ends here #########
             elif uinput == "s": # backwards
                 ######### Your code starts here #########
                 controller.forward_action(-0.25)
-                self._particle_filter.visualize_particles()
-                self._particle_filter.visualize_estimate()
+                # self._particle_filter.visualize_particles()
+                # self._particle_filter.visualize_estimate()
                 ######### Your code ends here #########
             else:
                 print("Invalid input")
