@@ -388,14 +388,26 @@ class Controller:
         # NOTE: with more than 2 angles the particle filter will converge too quickly, so with high likelihood the
         # correct neighborhood won't be found.
         if self.current_position is None or self.laserscan is None:
-            return
+        return
 
-        mid = len(self.laserscan.ranges) // 2
-        z = self.laserscan.ranges[mid]
-        if z != inf and not math.isnan(z):
-            self._particle_filter.measure(z, 0.0)
-            self._particle_filter.visualize_particles()
-            self._particle_filter.visualize_estimate()
+        n = len(self.laserscan.ranges)
+    
+        # Use a small set of beams, not just one.
+        idxs = [n // 2, n // 2 - n // 6, n // 2 + n // 6]
+    
+        for idx in idxs:
+            if idx < 0 or idx >= n:
+                continue
+    
+            z = self.laserscan.ranges[idx]
+            if not np.isfinite(z):
+                continue
+    
+            scan_angle = self.laserscan.angle_min + idx * self.laserscan.angle_increment
+            self._particle_filter.measure(z, scan_angle)
+    
+        self._particle_filter.visualize_particles()
+        self._particle_filter.visualize_estimate()
 
         ######### Your code ends here #########
 
@@ -510,7 +522,7 @@ if __name__ == "__main__":
 
     try:
         # Manual control
-        goal_theta = 0
+        goal_theta = controller.current_position["theta"]
         controller.take_measurements()
         while not rospy.is_shutdown():
             print("\nEnter 'a', 'w', 's', 'd' to move the robot:")
