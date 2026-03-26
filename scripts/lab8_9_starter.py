@@ -472,7 +472,7 @@ class Controller:
         self.robot_ctrl_pub.publish(Twist())
 
         delta_theta = angle_to_neg_pi_to_pi(goal_theta - start_theta)
-        self._particle_filter.move_by(0.0, delta_theta)
+        self._particle_filter.move_by(0.0, 0.0, delta_theta)
 
 
         ######### Your code ends here #########
