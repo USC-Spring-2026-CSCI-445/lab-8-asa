@@ -512,24 +512,24 @@ if __name__ == "__main__":
             if uinput == "w": # forward
                 ######### Your code starts here #########
                 controller.forward_action(0.25)
-
+                visualize_particles()
                 ######### Your code ends here #########
             elif uinput == "a": # left
                 ######### Your code starts here #########
                 goal_theta = angle_to_neg_pi_to_pi(goal_theta + pi / 2)
                 controller.rotate_action(goal_theta)
-
+                visualize_particles()
                 ######### Your code ends here #########
             elif uinput == "d": #right
                 ######### Your code starts here #########
                 goal_theta = angle_to_neg_pi_to_pi(goal_theta - pi / 2)
                 controller.rotate_action(goal_theta)
-
+                visualize_particles()
                 ######### Your code ends here #########
             elif uinput == "s": # backwards
                 ######### Your code starts here #########
                 controller.forward_action(-0.25)
-
+                visualize_particles()
                 ######### Your code ends here #########
             else:
                 print("Invalid input")
