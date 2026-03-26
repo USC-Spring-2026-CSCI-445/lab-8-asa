@@ -334,12 +334,65 @@ class Controller:
     def forward_action(self, distance: float):
         # Robot moves forward by a set amount during manual control
         ######### Your code starts here #########
+        if self.current_position is None:
+            return
+
+        start_x = self.current_position["x"]
+        start_y = self.current_position["y"]
+
+        speed = 0.15 if distance >= 0 else -0.15
+        cmd = Twist()
+        cmd.linear.x = speed
+        cmd.angular.z = 0.0
+
+        rate = rospy.Rate(20)
+        while not rospy.is_shutdown():
+            self.robot_ctrl_pub.publish(cmd)
+            rate.sleep()
+
+            if self.current_position is None:
+                continue
+
+            traveled = math.hypot(
+                self.current_position["x"] - start_x,
+                self.current_position["y"] - start_y,
+            )
+            if traveled >= abs(distance):
+                break
+
+        self.robot_ctrl_pub.publish(Twist())
+        self._particle_filter.move_by(distance, 0.0)
 
         ######### Your code ends here #########
 
     def rotate_action(self, goal_theta: float):
         # Robot turns by a set amount during manual control
         ######### Your code starts here #########
+        if self.current_position is None:
+            return
+
+        start_theta = self.current_position["theta"]
+        goal_theta = angle_to_neg_pi_to_pi(goal_theta)
+
+        cmd = Twist()
+        cmd.linear.x = 0.0
+        rate = rospy.Rate(20)
+
+        while not rospy.is_shutdown():
+            current_theta = angle_to_neg_pi_to_pi(self.current_position["theta"])
+            error = angle_to_neg_pi_to_pi(goal_theta - current_theta)
+
+            if abs(error) < 0.05:
+                break
+
+            cmd.angular.z = 0.5 if error > 0 else -0.5
+            self.robot_ctrl_pub.publish(cmd)
+            rate.sleep()
+
+        self.robot_ctrl_pub.publish(Twist())
+
+        delta_theta = angle_to_neg_pi_to_pi(goal_theta - start_theta)
+        self._particle_filter.move_by(0.0, delta_theta)
 
 
         ######### Your code ends here #########
@@ -378,18 +431,24 @@ if __name__ == "__main__":
             uinput = input("")
             if uinput == "w": # forward
                 ######### Your code starts here #########
+                controller.forward_action(0.25)
 
                 ######### Your code ends here #########
             elif uinput == "a": # left
                 ######### Your code starts here #########
+                goal_theta = angle_to_neg_pi_to_pi(goal_theta + pi / 2)
+                controller.rotate_action(goal_theta)
 
                 ######### Your code ends here #########
             elif uinput == "d": #right
                 ######### Your code starts here #########
+                goal_theta = angle_to_neg_pi_to_pi(goal_theta - pi / 2)
+                controller.rotate_action(goal_theta)
 
                 ######### Your code ends here #########
             elif uinput == "s": # backwards
                 ######### Your code starts here #########
+                controller.forward_action(-0.25)
 
                 ######### Your code ends here #########
             else:
