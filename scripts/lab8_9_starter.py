@@ -441,7 +441,7 @@ class Controller:
                 break
 
         self.robot_ctrl_pub.publish(Twist())
-        self._particle_filter.move_by(distance, 0.0)
+        self._particle_filter.move_by(distance, 0.0, 0.0)
 
         ######### Your code ends here #########
 
