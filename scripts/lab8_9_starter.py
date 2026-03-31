@@ -476,17 +476,13 @@ class Controller:
                 goal_theta = angle_to_neg_pi_to_pi(self.current_position["theta"] + turn_dir * math.pi / 2)
                 self.rotate_action(goal_theta)
             else:
-                if (count % 3 == 0): 
-                    self.forward_action(0.25)
-                    count += 1
-                elif (count % 3 == 1): 
+                
+                if (count == 0): 
                     self.rotate_action(math.pi/4)
-                    self.forward_action(0.25)
                     count += 1
-                elif (count % 3 == 2):
-                    self.rotate_action(-math.pi/4)
-                    self.forward_action(0.25)
-                    count += 1
+                else: 
+                    self.forward_action(0.3)
+
             self.take_measurements()
             step += 1
             estimate_x, estimate_y, estimate_theta = self._particle_filter.get_estimate()#get estimates
