@@ -602,37 +602,37 @@ if __name__ == "__main__":
         # Manual control
         goal_theta = 0
         controller.take_measurements()
-        while not rospy.is_shutdown():
-            print("\nEnter 'a', 'w', 's', 'd' to move the robot:")
-            uinput = input("")
-            if uinput == "w": # forward
-                ######### Your code starts here #########
-                controller.forward_action(0.28)
-                ######### Your code ends here #########
-            elif uinput == "a": # left
-                ######### Your code starts here #########
-                goal_theta = angle_to_neg_pi_to_pi(controller.current_position["theta"] + math.pi / 2)# add 90 degs to current theta
-                controller.rotate_action(goal_theta)
-                ######### Your code ends here #########
-            elif uinput == "d": #right
-                ######### Your code starts here #########
-                goal_theta = angle_to_neg_pi_to_pi(controller.current_position["theta"] - math.pi / 2)# subtract 90 degs
-                controller.rotate_action(goal_theta)
-                ######### Your code ends here #########
-            elif uinput == "s": # backwards
-                ######### Your code starts here #########
-                controller.forward_action(-0.28)
-                ######### Your code ends here #########
-            elif uinput == "auto":
-                print("Switching to auto explore")
-                break
-            else:
-                print("Invalid input")
-            ######### Your code starts here #########
-            controller.take_measurements()
-            controller._particle_filter.visualize_estimate()
-            controller._particle_filter.visualize_particles()
-            ######### Your code ends here #########
+        # while not rospy.is_shutdown():
+        #     print("\nEnter 'a', 'w', 's', 'd' to move the robot:")
+        #     uinput = input("")
+        #     if uinput == "w": # forward
+        #         ######### Your code starts here #########
+        #         controller.forward_action(0.28)
+        #         ######### Your code ends here #########
+        #     elif uinput == "a": # left
+        #         ######### Your code starts here #########
+        #         goal_theta = angle_to_neg_pi_to_pi(controller.current_position["theta"] + math.pi / 2)# add 90 degs to current theta
+        #         controller.rotate_action(goal_theta)
+        #         ######### Your code ends here #########
+        #     elif uinput == "d": #right
+        #         ######### Your code starts here #########
+        #         goal_theta = angle_to_neg_pi_to_pi(controller.current_position["theta"] - math.pi / 2)# subtract 90 degs
+        #         controller.rotate_action(goal_theta)
+        #         ######### Your code ends here #########
+        #     elif uinput == "s": # backwards
+        #         ######### Your code starts here #########
+        #         controller.forward_action(-0.28)
+        #         ######### Your code ends here #########
+        #     elif uinput == "auto":
+        #         print("Switching to auto explore")
+        #         break
+        #     else:
+        #         print("Invalid input")
+        #     ######### Your code starts here #########
+        #     controller.take_measurements()
+        #     controller._particle_filter.visualize_estimate()
+        #     controller._particle_filter.visualize_particles()
+        #     ######### Your code ends here #########
 
         # Autonomous exploration
         ######### Your code starts here #########
