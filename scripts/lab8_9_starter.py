@@ -480,11 +480,11 @@ class Controller:
                     self.forward_action(0.25)
                     count += 1
                 elif (count % 3 == 1): 
-                    self.rotate_action(-math.pi/2)
+                    self.rotate_action(math.pi/4)
                     self.forward_action(0.25)
                     count += 1
                 elif (count % 3 == 2):
-                    self.rotate_action(math.pi/2)
+                    self.rotate_action(-math.pi/4)
                     self.forward_action(0.25)
                     count += 1
             self.take_measurements()
