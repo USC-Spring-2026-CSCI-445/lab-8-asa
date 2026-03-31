@@ -478,15 +478,15 @@ class Controller:
             else:
                 if (count % 3 == 0): 
                     self.forward_action(0.25)
-                    count ++
+                    count += 1
                 elif (count % 3 == 1): 
                     self.rotate_action(-math.pi/2)
                     self.forward_action(0.25)
-                    count ++
+                    count += 1
                 elif (count % 3 == 2):
                     self.rotate_action(math.pi/2)
                     self.forward_action(0.25)
-                    count++
+                    count += 1
             self.take_measurements()
             step += 1
             estimate_x, estimate_y, estimate_theta = self._particle_filter.get_estimate()#get estimates
