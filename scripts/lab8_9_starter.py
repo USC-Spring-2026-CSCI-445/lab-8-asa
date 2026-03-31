@@ -478,7 +478,7 @@ class Controller:
             else:
                 
                 if (count == 0): 
-                    self.rotate_action(0.523599)
+                    self.rotate_action(0.785398)
                     count += 1
                 else: 
                     self.forward_action(0.3)
