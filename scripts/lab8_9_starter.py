@@ -480,8 +480,14 @@ class Controller:
                 if (count == 0): 
                     self.rotate_action(0.680678)
                     count += 1
-                else: 
-                    self.forward_action(0.3)
+                elif (count < 9):
+                    self.forward_action(0.5)
+                    count += 1
+                elif (count == 9):
+                    self.rotate_action(3.83972435)
+                    count += 1
+                else:
+                    self.forward_action(0.5)
 
             self.take_measurements()
             step += 1
