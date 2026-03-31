@@ -464,6 +464,7 @@ class Controller:
         stable =0
         step= 0
         rate = rospy.Rate(10)
+        count = 0
         while not rospy.is_shutdown(): #exploreuntil the convergence is met
             frontindex = int(round((0 - self.laserscan.angle_min) / self.laserscan.angle_increment))
             frontindex = max(0,min(frontindex, len(self.laserscan.ranges)-1))
@@ -475,7 +476,15 @@ class Controller:
                 goal_theta = angle_to_neg_pi_to_pi(self.current_position["theta"] + turn_dir * math.pi / 2)
                 self.rotate_action(goal_theta)
             else:
-                self.forward_action(0.25)
+                if (count % 3 == 0): 
+                    self.forward_action(0.25)
+                    count ++
+                elif (count % 3 == 1): 
+                    self.rotate_action(math.pi/2)
+                    count ++
+                elif (count % 3 == 2):
+                    self.rotate_action(-math.pi/2)
+                    count++
             self.take_measurements()
             step += 1
             estimate_x, estimate_y, estimate_theta = self._particle_filter.get_estimate()#get estimates
@@ -492,7 +501,7 @@ class Controller:
             else:
                 stable = 0
             
-            if step>=7 or stable >=5:
+            if step>=15 or stable >=5:
                 print("auto exploration is done")
                 break
             rate.sleep()
