@@ -388,7 +388,7 @@ class Controller:
         # NOTE: with more than 2 angles the particle filter will converge too quickly, so with high likelihood the
         # correct neighborhood won't be found.
         if self.current_position is None or self.laserscan is None:
-        return
+            return
 
         n = len(self.laserscan.ranges)
     
