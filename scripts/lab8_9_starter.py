@@ -292,13 +292,13 @@ class ParticleFilter:
         """
         log_ws = [p.log_p for p in self._particles]
  
-        # Numerically stable softmax-style normalisation.
+        # stable normalisation?
         max_log_w = max(log_ws)
         weights   = np.array([math.exp(w - max_log_w) for w in log_ws], dtype=float)
         total     = weights.sum()
  
         if total <= 0 or not np.isfinite(total):
-            # Degenerate case — reset to uniform.
+            # degenerate case — reset to uniform
             weights = np.ones(len(self._particles), dtype=float) / len(self._particles)
         else:
             weights /= total
@@ -306,7 +306,7 @@ class ParticleFilter:
         idxs = choice(len(self._particles), size=self.n_particles, p=weights)
         self._particles = [copy.deepcopy(self._particles[i]) for i in idxs]
  
-        # Reset accumulated log-weights to uniform after resampling.
+        # reset accumulated log weights to uniform after resampling.
         uniform_log_p = -math.log(self.n_particles)
         for p in self._particles:
             p.log_p = uniform_log_p
