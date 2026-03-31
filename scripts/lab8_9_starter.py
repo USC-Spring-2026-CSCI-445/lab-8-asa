@@ -268,35 +268,48 @@ class ParticleFilter:
 
         # Calculate posterior probabilities and resample
         ######### Your code starts here #########
-        if z is None or z == inf:
+        if z is None or z == inf or not np.isfinite(z):
             return
-
-        log_ws = []
+ 
         for p in self._particles:
-            expected = self.map.closest_distance(
-                (p.x, p.y), angle_to_0_to_2pi(p.theta + scan_angle_in_rad)
-            )
+            world_angle = angle_to_0_to_2pi(p.theta + scan_angle_in_rad)
+            expected = self.map.closest_distance((p.x, p.y), world_angle)
+ 
             if expected is None:
-                log_w = -1e9
+                log_likelihood = -1e9
             else:
-                log_w = scipy.stats.norm(
+                log_likelihood = scipy.stats.norm(
                     loc=expected, scale=self.measurement_variance
                 ).logpdf(z)
-            p.log_p = log_w
-            log_ws.append(log_w)
+ 
+            # Accumulate log-weights so multiple beams each contribute.
+            p.log_p += log_likelihood
 
-        max_log_w = max(log_ws) if log_ws else 0.0
-        weights = np.array([math.exp(w - max_log_w) for w in log_ws], dtype=float)
-        s = weights.sum()
-        if s <= 0 or not np.isfinite(s):
+    def resample(self):
+        """
+        Resample particles proportional to their accumulated weights.
+        Call this once after all measure() calls for a time step.
+        """
+        log_ws = [p.log_p for p in self._particles]
+ 
+        # Numerically stable softmax-style normalisation.
+        max_log_w = max(log_ws)
+        weights   = np.array([math.exp(w - max_log_w) for w in log_ws], dtype=float)
+        total     = weights.sum()
+ 
+        if total <= 0 or not np.isfinite(total):
+            # Degenerate case — reset to uniform.
             weights = np.ones(len(self._particles), dtype=float) / len(self._particles)
         else:
-            weights /= s
-
+            weights /= total
+ 
         idxs = choice(len(self._particles), size=self.n_particles, p=weights)
         self._particles = [copy.deepcopy(self._particles[i]) for i in idxs]
+ 
+        # Reset accumulated log-weights to uniform after resampling.
+        uniform_log_p = -math.log(self.n_particles)
         for p in self._particles:
-            p.log_p = -math.log(self.n_particles)
+            p.log_p = uniform_log_p
 
 
         ######### Your code ends here #########
@@ -405,6 +418,8 @@ class Controller:
     
             scan_angle = self.laserscan.angle_min + idx * self.laserscan.angle_increment
             self._particle_filter.measure(z, scan_angle)
+
+        self._particle_filter.resample()
     
         self._particle_filter.visualize_particles()
         self._particle_filter.visualize_estimate()
