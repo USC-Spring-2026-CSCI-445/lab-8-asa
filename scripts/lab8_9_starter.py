@@ -476,18 +476,16 @@ class Controller:
                 goal_theta = angle_to_neg_pi_to_pi(self.current_position["theta"] + turn_dir * math.pi / 2)
                 self.rotate_action(goal_theta)
             else:
-                
-                if (count == 0): 
-                    self.rotate_action(0.785398)
-                    count += 1
-                elif (count < 18):
-                    self.forward_action(0.25)
-                    count += 1
-                elif (count == 18):
-                    self.rotate_action(3.92699)
-                    count += 1
+                if count % 2 == 0:
+                    # up
+                    goal_theta = angle_to_neg_pi_to_pi(self.current_position["theta"])
                 else:
-                    self.forward_action(0.5)
+                    # turn left 90 degrees
+                    goal_theta = angle_to_neg_pi_to_pi(self.current_position["theta"] + math.pi / 2)
+                
+                self.rotate_action(goal_theta)
+                self.forward_action(0.25)
+                count += 1
 
             self.take_measurements()
             step += 1
