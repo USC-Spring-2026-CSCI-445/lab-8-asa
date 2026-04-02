@@ -476,7 +476,7 @@ class Controller:
                 goal_theta = angle_to_neg_pi_to_pi(self.current_position["theta"] + turn_dir * math.pi / 2)
                 self.rotate_action(goal_theta)
             else:
-                if count < 19:
+                if count < 17:
                     if count % 2 == 0:
                         # up
                         goal_theta = 0
