@@ -476,7 +476,7 @@ class Controller:
                 goal_theta = angle_to_neg_pi_to_pi(self.current_position["theta"] + turn_dir * math.pi / 2)
                 self.rotate_action(goal_theta)
             else:
-                if count < 17:
+                if count < 15:
                     if count % 2 == 0:
                         # up
                         goal_theta = 0
@@ -518,7 +518,7 @@ class Controller:
             else:
                 stable = 0
             
-            if step>=23 or stable >=5:
+            if step>=20 or stable >=5:
                 print("auto exploration is done")
                 break
             rate.sleep()
