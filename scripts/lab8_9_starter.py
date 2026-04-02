@@ -505,7 +505,7 @@ class Controller:
             else:
                 stable = 0
             
-            if step>=14 or stable >=5:
+            if step>=23 or stable >=5:
                 print("auto exploration is done")
                 break
             rate.sleep()
