@@ -485,7 +485,7 @@ class Controller:
                     goal_theta = math.pi / 2
                 
                 self.rotate_action(goal_theta)
-                self.forward_action(0.25)
+                self.forward_action(0.5)
                 count += 1
 
             self.take_measurements()
