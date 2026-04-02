@@ -478,11 +478,11 @@ class Controller:
             else:
                 if count % 2 == 0:
                     # up
-                    goal_theta = math.pi / 2
+                    goal_theta = 0
 
                 else:
                     # turn left 90 degrees
-                    goal_theta = math.pi
+                    goal_theta = math.pi / 2
                 
                 self.rotate_action(goal_theta)
                 self.forward_action(0.25)
